@@ -1,0 +1,68 @@
+body {
+  margin: 0;
+  padding: 0;
+  -webkit-font-smoothing: antialiased;
+  font-family: "Open Sans", sans-serif;
+  font-size: 16px;
+  color: #333;
+  line-height: 1.5em;
+}
+
+h1, h2, h3 {
+  color: #000;
+}
+h1 {
+  font-size: 2.5em
+}
+
+h2 {
+  font-size: 2em
+}
+
+h3 {
+  font-size: 1.5em
+}
+
+a {
+  text-decoration: none;
+  color: #09f;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: "PT Serif", serif;
+}
+
+select.form-control,
+textarea.form-control,
+input.form-control {
+  font-size: 16px;
+}
+input[type=file] {
+  width: 100%;
+}
+
+.App {
+  margin-top: 15px;
+}
+
+.App .navbar-brand {
+  font-weight: bold;
+}
+
+.Home .lander {
+  padding: 80px 0;
+  text-align: center;
+}
+
+.Home .lander h1 {
+  font-family: "Open Sans", sans-serif;
+  font-weight: 600;
+}
+
+.Home .lander p {
+  color: #999;
+}
