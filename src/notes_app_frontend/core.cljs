@@ -17,6 +17,18 @@
       nav-item]]))
 
 ;; -------------------------
+;; Components
+
+(defn route-nav-item
+  [props & content]
+  (fn [props]
+    (let [props (if (= (get props :href)
+                       js/window.location.pathname)
+                       (conj props {:class "active"})
+                       props)]
+      [nav-item props content])))
+
+;; -------------------------
 ;; Views
 
 (defn home-page []
@@ -29,15 +41,15 @@
   "Wraps all other page content in container that has navigation in the header"
   []
   [:div.App.container
-   [navbar {:fluid true :collapseOnSelect true}
+   [navbar {:class "navbar-fluid navbar-collapse-on-select"}
     [navbar-header
      [navbar-brand
       [:a {:href "/"} "Scratch"]]
      [navbar-toggle]
      [navbar-collapse
       [nav {:pullRight true}
-       [nav-item {:href "/signup"} "Signup"]
-       [nav-item {:href "/login"} "Login"]]]]]
+       [route-nav-item {:href "/signup"} "Signup"]
+       [route-nav-item {:href "/login"} "Login"]]]]]
    [(session/get :current-page)]])
 
 ;; -------------------------
