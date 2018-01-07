@@ -1,7 +1,7 @@
 (ns notes-app-frontend.core
-  (:import goog.history.Html5History
-           goog.Uri)
+  (:import goog.History)
   (:require
+    [clojure.string :as s]
     [secretary.core :as secretary :refer-macros [defroute]]
     [goog.events :as events]
     [goog.history.EventType :as EventType]
@@ -17,16 +17,24 @@
       nav-item]]))
 
 ;; -------------------------
+;; Atoms
+
+;; -------------------------
 ;; Components
 
 (defn route-nav-item
   [props & content]
   (fn [props]
-    (let [props (if (= (get props :href)
-                       js/window.location.pathname)
-                       (conj props {:class "active"})
-                       props)]
-      [nav-item props content])))
+    (let [new-props (if (s/ends-with?
+                          js/window.location.href
+                          (get props :href))
+                      (conj props {:class "active"})
+                      props)
+          view (session/get :current-page)]
+      ;(.log js/console @current-url)
+      ;(.log js/console (get props :href))
+      ;(.log js/console new-props)
+      [nav-item new-props content])))
 
 ;; -------------------------
 ;; Views
@@ -37,46 +45,50 @@
     [:h1 "Scratch"]
     [:p "A simple note taking app"]]])
 
+(defn login-page []
+  [:div.Login
+   [:h1 "Login"]])
+
+(defn signup-page []
+  [:div.Signup
+   [:h1 "Signup"]])
+
 (defn current-page
   "Wraps all other page content in container that has navigation in the header"
   []
   [:div.App.container
-   [navbar {:class "navbar-fluid navbar-collapse-on-select"}
+   [navbar {:fluid true
+            :collapseOnSelect true}
     [navbar-header
      [navbar-brand
       [:a {:href "/"} "Scratch"]]
-     [navbar-toggle]
-     [navbar-collapse
-      [nav {:pullRight true}
-       [route-nav-item {:href "/signup"} "Signup"]
-       [route-nav-item {:href "/login"} "Login"]]]]]
+     [navbar-toggle]]
+    [navbar-collapse
+     [nav {:pullRight true}
+      [route-nav-item {:href "#/signup"} "Signup"]
+      [route-nav-item {:href "#/login"} "Login"]]]]
    [(session/get :current-page)]])
 
 ;; -------------------------
 ;; Routes
+(secretary/set-config! :prefix "#")
 
 (defroute "/" [] (session/put! :current-page home-page))
+
+(defroute "/signup" [] (session/put! :current-page signup-page))
+
+(defroute "/login" [] (session/put! :current-page login-page))
 
 ;; -------------------------
 ;; History
 
 (defn hook-browser-navigation! []
-  (let [history (doto (Html5History.)
+  (let [history (doto (History.)
                   (events/listen
                     EventType/NAVIGATE
                     (fn [event]
                       (secretary/dispatch! (.-token event))))
-                  (.setUseFragment false)
-                  (.setPathPrefix "")
-                  (.setEnabled true))]
-
-    (events/listen js/document "click"
-                   (fn [e]
-                     (. e preventDefault)
-                     (let [path (.getPath (.parse Uri (.-href (.-target e))))
-                           title (.-title (.-target e))]
-                       (when path
-                         (. history (setToken path title))))))))
+                  (.setEnabled true))]))
 
 ;; -------------------------
 ;; Initialize app
