@@ -16,6 +16,11 @@
       nav
       nav-item]]))
 
+(defn validate-form
+  "Validate login form submit"
+  [email-atom password-atom]
+  (not (and (not (s/blank? @email-atom)) (not (s/blank? @password-atom)))))
+
 ;; -------------------------
 ;; Atoms
 
@@ -31,10 +36,36 @@
                       (conj props {:class "active"})
                       props)
           view (session/get :current-page)]
-      ;(.log js/console @current-url)
-      ;(.log js/console (get props :href))
-      ;(.log js/console new-props)
       [nav-item new-props content])))
+
+(defn input-element
+  "An input element which updates its value and on focus parameters on change, blur, and focus"
+  [id name type value]
+  [:input {:id        id
+           :name      name
+           :class     "form-control"
+           :type      type
+           :required  ""
+           :value     @value
+           :on-change #(reset! value (-> % .-target .-value))}])
+
+(defn email-form
+  [email-address-atom]
+  (input-element "email"
+                    "email"
+                    "email"
+                    email-address-atom))
+
+(defn password-form [password-atom]
+  (input-element "password"
+                    "password"
+                    "password"
+                    password-atom))
+
+(defn wrap-as-element-in-form
+  [element]
+  [:div {:class "form-group form-group-lg"}
+   element])
 
 ;; -------------------------
 ;; Views
@@ -46,18 +77,28 @@
     [:p "A simple note taking app"]]])
 
 (defn login-page []
-  [:div.Login
-   [:h1 "Login"]])
+  (let [email-address (r/atom nil)
+        password (r/atom nil)]
+    (fn []
+      [:div.Login
+       [:form {:on-submit (fn [event] (.preventDefault event))}
+        (wrap-as-element-in-form [email-form email-address])
+        (wrap-as-element-in-form [password-form password])
+        [:button.btn.btn-default.btn-lg {:disabled (validate-form email-address password) :type "submit"} "Login"]]])))
 
 (defn signup-page []
   [:div.Signup
    [:h1 "Signup"]])
 
+(defn not-found-page []
+  [:div.NotFound
+   [:h3 "Sorry, page not found!"]])
+
 (defn current-page
   "Wraps all other page content in container that has navigation in the header"
   []
   [:div.App.container
-   [navbar {:fluid true
+   [navbar {:fluid            true
             :collapseOnSelect true}
     [navbar-header
      [navbar-brand
@@ -78,6 +119,8 @@
 (defroute "/signup" [] (session/put! :current-page signup-page))
 
 (defroute "/login" [] (session/put! :current-page login-page))
+
+(defroute "*" [] (session/put! :current-page not-found-page))
 
 ;; -------------------------
 ;; History

@@ -8,6 +8,7 @@
                  [org.clojure/clojurescript "1.9.946"]
                  [reagent "0.7.0"]
                  [reagent-utils "0.2.1"]
+                 [reagent-forms "0.5.35"]
                  [secretary "1.2.3"]
                  [wilson "0.33.1"]]
 
