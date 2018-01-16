@@ -1,9 +1,0 @@
-<component name="libraryTable">
-  <library name="Leiningen: wilson:0.33.1">
-    <CLASSES>
-      <root url="jar://$MAVEN_REPOSITORY$/wilson/wilson/0.33.1/wilson-0.33.1.jar!/" />
-    </CLASSES>
-    <JAVADOC />
-    <SOURCES />
-  </library>
-</component>
