@@ -37,6 +37,9 @@
 
 (defonce user-pool (get-user-pool))
 
+(defn set-hash! [loc]
+  (set! (.-hash js/window.location) loc))
+
 (defn- create-cognito-user [email]
   (new CognitoUser
        (clj->js
@@ -50,7 +53,7 @@
 
 (defn login
   "Authenticate user against AWS cognito"
-  [email password]
+  [email password loading-atom]
   (let [user (create-cognito-user email)
         auth-details (new AuthenticationDetails
                           (clj->js
@@ -59,6 +62,7 @@
     (go
       (let [success-chan (a/chan)
             err-chan (a/chan)]
+        (reset! loading-atom true)
         (.authenticateUser user
                            auth-details
                            (clj->js
@@ -68,8 +72,13 @@
                                            (go (a/>! err-chan err)))}))
         (let [[v ch] (a/alts! [success-chan err-chan])]
           (if (= ch success-chan)
-            (session/put! :authenticated? true)
-            (js/alert v)))))))
+            (do 
+              (session/put! :authenticated? true)
+              (reset! loading-atom false)
+              (set-hash! ""))
+            (js/alert v)))
+        (a/close! success-chan)
+        (a/close! err-chan)))))
 
 (defn authenticate-user
   "Check user's authentication status"
@@ -79,6 +88,7 @@
       (go
         (let [success-chan (a/chan)
               err-chan (a/chan)]
+          (session/put! :authenticating? true)
           (.getSession u
                        (fn [err session]
                          (go
@@ -87,10 +97,21 @@
                              :default (a/>! success-chan (-> session .getIdToken .getJwtToken))))))
           (let [[v ch] (a/alts! [success-chan err-chan])]
             (if (= ch success-chan)
-              (do
-                (session/put! :authenticated? true)
-                (session/put! :authenticating? false))
-              (js/alert v))))))))
+              (session/put! :authenticated? true)
+              (js/alert v)))
+          (a/close! success-chan)
+          (a/close! err-chan))))
+    (session/put! :authenticating? false)))
+
+(defn logout
+  "Logout incognito session"
+  []
+  (let [u (.getCurrentUser user-pool)]
+    (when (some? u)
+      (.signOut u)
+      (session/put! :authenticated? false)
+      (set-hash! "/login"))))
+
 ;; -------------------------
 ;; Atoms
 
@@ -119,7 +140,7 @@
    [navbar-collapse
     (if (session/get :authenticated?)
       [nav {:pullRight true}
-       [nav-item {:on-click (fn [] (session/put! :authenticated? false))} "Logout"]]
+       [nav-item {:on-click #(logout)} "Logout"]]
       [nav {:pullRight true}
        [route-nav-item {:href "#/signup"} "Signup"]
        [route-nav-item {:href "#/login"} "Login"]])]])
@@ -159,6 +180,16 @@
   [:div {:class "form-group form-group-lg"}
    element])
 
+(defn loader-button
+  "Button with loader animation"
+  []
+  (let [this (r/current-component)
+        props (r/props this)
+        {:keys [loading? text loading-text disabled]} props
+        updated-props (assoc-in props [:disabled] (or loading? disabled))
+        new-props (dissoc updated-props :loading? :text :loading-text)]
+    [:button new-props (if loading? loading-text text)]))
+
 ;; -------------------------
 ;; Views
 
@@ -170,15 +201,21 @@
 
 (defn login-page []
   (let [email-address (r/atom nil)
-        password (r/atom nil)]
+        password (r/atom nil)
+        loading? (r/atom false)]
     (fn []
       [:div.Login
        [:form {:on-submit (fn [event]
                             (.preventDefault event)
-                            (login @email-address @password))}
+                            (login @email-address @password loading?))}
         (wrap-as-element-in-form [email-form email-address])
         (wrap-as-element-in-form [password-form password])
-        [:button.btn.btn-default.btn-lg {:disabled (validate-form email-address password) :type "submit"} "Login"]]])))
+        [loader-button {:class "btn btn-default btn-lg" 
+                         :loading? @loading?
+                         :loading-text "Logging in..."
+                         :text "Login"
+                         :disabled (validate-form email-address password) 
+                         :type "submit"}]]])))
 
 (defn signup-page []
   [:div.Signup
@@ -231,3 +268,4 @@
   (session/put! :authenticated? false)
   (session/put! :authenticating? true)
   (mount-root))
+
