@@ -72,7 +72,7 @@
                                            (go (a/>! err-chan err)))}))
         (let [[v ch] (a/alts! [success-chan err-chan])]
           (if (= ch success-chan)
-            (do 
+            (do
               (session/put! :authenticated? true)
               (reset! loading-atom false)
               (set-hash! ""))
@@ -188,7 +188,9 @@
         {:keys [loading? text loading-text disabled]} props
         updated-props (assoc-in props [:disabled] (or loading? disabled))
         new-props (dissoc updated-props :loading? :text :loading-text)]
-    [:button new-props (if loading? loading-text text)]))
+    [:button.LoaderButton new-props
+     (if loading? [:span.glyphicon.glyphicon-refresh.spinning])
+     (if loading? loading-text text)]))
 
 ;; -------------------------
 ;; Views
@@ -210,12 +212,12 @@
                             (login @email-address @password loading?))}
         (wrap-as-element-in-form [email-form email-address])
         (wrap-as-element-in-form [password-form password])
-        [loader-button {:class "btn btn-default btn-lg" 
-                         :loading? @loading?
-                         :loading-text "Logging in..."
-                         :text "Login"
-                         :disabled (validate-form email-address password) 
-                         :type "submit"}]]])))
+        [loader-button {:class        "btn btn-default btn-lg"
+                        :loading?     @loading?
+                        :loading-text "Logging in..."
+                        :text         "Login"
+                        :disabled     (validate-form email-address password)
+                        :type         "submit"}]]])))
 
 (defn signup-page []
   [:div.Signup
