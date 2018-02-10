@@ -5,7 +5,7 @@
 (defn set-hash! [loc]
   (set! (.-hash js/window.location) loc))
 
-(defn validate-form
+(defn validate-login-form
   "Validate login form submit"
   [email-atom password-atom]
-  (not (and (not (s/blank? @email-atom)) (not (s/blank? @password-atom)))))
+  (not (or (s/blank? @email-atom) (s/blank? @password-atom))))

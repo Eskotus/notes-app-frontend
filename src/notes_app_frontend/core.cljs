@@ -4,6 +4,7 @@
     [notes-app-frontend.aws-lib :as aws]
     [notes-app-frontend.components :as c]
     [notes_app_frontend.utils :as u]
+    [notes_app_frontend.views.signup-page :as signup]
     [secretary.core :as secretary :refer-macros [defroute]]
     [goog.events :as events]
     [goog.history.EventType :as EventType]
@@ -28,13 +29,13 @@
        [:form {:on-submit (fn [event]
                             (.preventDefault event)
                             (aws/login @email-address @password loading?))}
-        (c/wrap-as-element-in-form [c/email-form email-address])
-        (c/wrap-as-element-in-form [c/password-form password])
+        [c/email-form email-address]
+        [c/password-form password]
         [c/loader-button {:class        "btn btn-default btn-lg btn-block"
                           :loading?     @loading?
                           :loading-text "Logging in..."
                           :text         "Login"
-                          :disabled     (u/validate-form email-address password)
+                          :disabled     (u/validate-login-form email-address password)
                           :type         "submit"}]]])))
 
 (defn signup-page []
@@ -60,7 +61,7 @@
 
 (defroute "/" [] (session/put! :current-page home-page))
 
-(defroute "/signup" [] (session/put! :current-page signup-page))
+(defroute "/signup" [] (session/put! :current-page signup/render))
 
 (defroute "/login" [] (session/put! :current-page login-page))
 

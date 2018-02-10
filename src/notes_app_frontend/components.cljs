@@ -45,19 +45,20 @@
   ([id name type value]
    (input-element id name type value false))
   ([id name type value auto-focus]
-   [:input {:id         id
-            :name       name
-            :class      "form-control"
-            :auto-focus auto-focus
-            :type       type
-            :required   ""
-            :value      @value
-            :on-change  #(reset! value (-> % .-target .-value))}]))
+   [:div {:class "form-group form-group-lg"}
+      [:label {:for id :class "control-label"} name]
+      [:input {:id         id
+               :class      "form-control"
+               :auto-focus auto-focus
+               :type       type
+               :required   ""
+               :value      @value
+               :on-change  #(reset! value (-> % .-target .-value))}]]))
 
 (defn email-form
   [email-address-atom]
   (input-element "email"
-                 "email"
+                 "Email"
                  "email"
                  email-address-atom
                  true))
@@ -65,10 +66,26 @@
 (defn password-form
   [password-atom]
   (input-element "password"
-                 "password"
+                 "Password"
                  "password"
                  password-atom
                  false))
+
+(defn confirm-password-form
+  [confirm-password-atom]
+  (input-element "confirmPassword"
+                 "Confirm password"
+                 "password"
+                 confirm-password-atom
+                 false))
+
+(defn confirmation-form
+  [confirmation-atom]
+  (input-element "confirmationCode"
+                 "Confirmation code"
+                 "tel"
+                 confirmation-atom
+                 true))
 
 (defn wrap-as-element-in-form
   [element]
