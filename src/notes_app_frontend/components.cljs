@@ -87,11 +87,6 @@
                  confirmation-atom
                  true))
 
-(defn wrap-as-element-in-form
-  [element]
-  [:div {:class "form-group form-group-lg"}
-   element])
-
 (defn loader-button
   "Button with loader animation"
   []

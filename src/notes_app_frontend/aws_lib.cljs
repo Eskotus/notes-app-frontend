@@ -29,6 +29,7 @@
        (clj->js
          {:Username email
           :Pool     user-pool})))
+
 (defn login
   "Authenticate user against AWS cognito"
   [email password loading-atom]
@@ -89,3 +90,17 @@
       (.signOut u)
       (session/put! :authenticated? false)
       (u/set-hash! "/login"))))
+
+(defn signup
+  "Register a new cognito user"
+  [email password cb]
+  (let [attr-email (new CognitoUserAttribute
+                      (clj->js {:Name "email" :Value email}))]
+    (.signUp user-pool
+             email
+             password
+             (to-array [attr-email]) nil
+             (fn [err result]
+               (if (some? err)
+                 (cb (js->clj err :keywordize-keys true))
+                 (cb (js->clj result :keywordize-keys true)))))))
