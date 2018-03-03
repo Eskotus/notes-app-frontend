@@ -3,12 +3,14 @@
     [notes_app_frontend.utils :as u]
     [reagent.core :as r]
     [clojure.string :as s]
+    [reagent.session :as session]
     [cljs.core.async :as a :refer-macros [go]]
     [notes-app-frontend.components :as c]
     [notes-app-frontend.aws-lib :as aws]
     [wilson.react-bootstrap :refer [help-block]]))
 
-(defn handle-submit [event loading? email password confirm-password new-user]
+(defn handle-submit
+  [event loading? email password confirm-password new-user]
   (.preventDefault event)
   (reset! loading? true)
   (go
@@ -18,12 +20,21 @@
         (reset! new-user (:user result)))
       (reset! loading? false))))
 
-
-(defn handle-confirmation-submit [event loading? confirmation-code]
+(defn handle-confirmation-submit
+  [event loading? confirmation-code new-user email password]
   (.preventDefault event)
   (reset! loading? true)
-  (.log js/console "Verify button clicked")
-  (reset! loading? false))
+  (go
+    (let [result (a/<! (u/<<< aws/confirm @new-user @confirmation-code))]
+      (if (instance? js/Error result)
+        (js/alert result)
+        (let [result (a/<! (u/<<< aws/login @email @password))]
+          (if (instance? js/Error result)
+            (js/alert result)
+            (do
+              (session/put! :authenticated? true)
+              (u/set-hash! ""))))))
+    (reset! loading? false)))
 
 (defn validate-confirmation-form [confirmation-code]
   (empty? @confirmation-code))
@@ -35,10 +46,10 @@
 
 (defn confirmation-form
   "Render form for entering confirmation code"
-  [loading?]
+  [loading? new-user email password]
   (let [confirmation-code (r/atom nil)]
-    (fn [loading?]
-      [:form {:on-submit #(handle-confirmation-submit % loading? confirmation-code)}
+    (fn [loading? new-user email password]
+      [:form {:on-submit #(handle-confirmation-submit % loading? confirmation-code new-user email password)}
        [c/confirmation-form confirmation-code]
        [help-block "Please check your email for the code."]
        [c/loader-button {:class        "btn btn-default btn-lg btn-block"
@@ -48,18 +59,16 @@
                          :disabled     (validate-confirmation-form confirmation-code)
                          :type         "submit"}]])))
 
-(defn signup-form [loading? new-user]
-  (let [email-address (r/atom nil)
-        password (r/atom nil)
-        confirm-password (r/atom nil)]
-    (fn [loading? new-user]
+(defn signup-form [loading? new-user email password]
+  (let [confirm-password (r/atom nil)]
+    (fn [loading? new-user email password]
       [:form {:on-submit #(handle-submit %
                                          loading?
-                                         email-address
+                                         email
                                          password
                                          confirm-password
                                          new-user)}
-       [c/email-form email-address]
+       [c/email-form email]
        [c/password-form password]
        [c/confirm-password-form confirm-password]
        [c/loader-button {:class        "btn btn-default btn-lg btn-block"
@@ -67,7 +76,7 @@
                          :loading-text "Signing up..."
                          :text         "Signup"
                          :type         "submit"
-                         :disabled     (validate-form email-address
+                         :disabled     (validate-form email
                                                       password
                                                       confirm-password)}]])))
 
@@ -75,9 +84,11 @@
 
 (defn render []
   (let [loading? (r/atom false)
-        new-user (r/atom nil)]
+        new-user (r/atom nil)
+        email (r/atom nil)
+        password (r/atom nil)]
     (fn []
       [:div {:class "Signup"}
        (if (nil? @new-user)
-         [signup-form loading? new-user]
-         [confirmation-form loading?])])))
+         [signup-form loading? new-user email password]
+         [confirmation-form loading? new-user email password])])))

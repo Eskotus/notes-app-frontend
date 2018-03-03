@@ -4,7 +4,11 @@
     [notes-app-frontend.aws-lib :as aws]
     [notes-app-frontend.components :as c]
     [notes_app_frontend.utils :as u]
+    [notes_app_frontend.views.home-page :as home]
+    [notes_app_frontend.views.not-found-page :as not-found]
+    [notes_app_frontend.views.login-page :as login]
     [notes_app_frontend.views.signup-page :as signup]
+    [notes_app_frontend.views.new-note-page :as new-note]
     [secretary.core :as secretary :refer-macros [defroute]]
     [goog.events :as events]
     [goog.history.EventType :as EventType]
@@ -13,38 +17,6 @@
 
 ;; -------------------------
 ;; Views
-
-(defn home-page []
-  [:div.Home
-   [:div.lander
-    [:h1 "Scratch"]
-    [:p "A simple note taking app"]]])
-
-(defn login-page []
-  (let [email-address (r/atom nil)
-        password (r/atom nil)
-        loading? (r/atom false)]
-    (fn []
-      [:div.Login
-       [:form {:on-submit (fn [event]
-                            (.preventDefault event)
-                            (aws/login @email-address @password loading?))}
-        [c/email-form email-address]
-        [c/password-form password]
-        [c/loader-button {:class        "btn btn-default btn-lg btn-block"
-                          :loading?     @loading?
-                          :loading-text "Logging in..."
-                          :text         "Login"
-                          :disabled     (u/validate-login-form email-address password)
-                          :type         "submit"}]]])))
-
-(defn signup-page []
-  [:div.Signup
-   [:h1 "Signup"]])
-
-(defn not-found-page []
-  [:div.NotFound
-   [:h3 "Sorry, page not found!"]])
 
 (defn current-page
   "Wraps all other page content in container that has navigation in the header"
@@ -59,13 +31,15 @@
 ;; Routes
 (secretary/set-config! :prefix "#")
 
-(defroute "/" [] (session/put! :current-page home-page))
+(defroute "/" [] (session/put! :current-page home/render))
 
 (defroute "/signup" [] (session/put! :current-page signup/render))
 
-(defroute "/login" [] (session/put! :current-page login-page))
+(defroute "/login" [] (session/put! :current-page login/render))
 
-(defroute "*" [] (session/put! :current-page not-found-page))
+(defroute "/notes/new" [] (session/put! :current-page new-note/render))
+
+(defroute "*" [] (session/put! :current-page not-found/render))
 
 ;; -------------------------
 ;; History

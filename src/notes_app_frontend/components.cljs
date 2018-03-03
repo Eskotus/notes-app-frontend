@@ -13,6 +13,13 @@
       nav
       nav-item]]))
 
+(defn- handle-input-change
+  "Resets atom associated with input based on input type"
+  [event value type]
+  (if (= type "file")
+    (reset! value (get (-> event .target .files) 0))
+    (reset! value (-> event .-target .-value))))
+
 (defn route-nav-item
   [props & content]
   (fn []
@@ -51,9 +58,8 @@
                :class      "form-control"
                :auto-focus auto-focus
                :type       type
-               :required   ""
                :value      @value
-               :on-change  #(reset! value (-> % .-target .-value))}]]))
+               :on-change  #(handle-input-change % value type)}]]))
 
 (defn email-form
   [email-address-atom]
