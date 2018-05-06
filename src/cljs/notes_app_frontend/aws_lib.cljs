@@ -2,10 +2,9 @@
   (:require
     [notes-app-frontend.utils :as u]
     [cljs.core.async :as a :refer-macros [go]]
-    [reagent.session :as session]))
-    ;[aws-amplify :refer [Amplify Auth]]
-    ;cljsjs.amazon-cognito-identity-js
-    ;cljsjs.aws-sdk-js))
+    [reagent.session :as session]
+    cljsjs.amazon-cognito-identity-js
+    cljsjs.aws-sdk-js))
 
 (def config
   {:cognito
@@ -19,28 +18,6 @@
    :s3
    {:region               "us-east-1"
     :bucket               ""}})
-
-; (defonce amplify-configuration
-;   (.configure
-;     Amplify
-;     (clj->js
-;       {:Auth
-;        {:mandatorySignIn      true
-;         :region               (get-in config [:cognito :region])
-;         :userPoolId           (get-in config [:cognito :user-pool-id])
-;         :identityPoolId       (get-in config [:cognito :identity-pool-id])
-;         :userPoolWebClientId  (get-in config [:cognito :user-pool-client-id])}
-;        :Storage
-;        {:region               (get-in config [:s3 :region])
-;         :bucket               (get-in config [:s3 :region])
-;         :identityPoolId       (get-in config [:cognito :identity-pool-id])}
-;        :API
-;        {:endpoints
-;         [{:name               "notes"
-;           :endpoint           (get-in config [:api-gateway :url])
-;           :region             (get-in config [:api-gateway :region])}]}})))
-
-
 
 (def authenticator (str "cognito-idp."
                         (get-in config [:cognito :region])
@@ -97,11 +74,6 @@
                        (clj->js
                          {:onSuccess #(callback-wrapper nil % cb)
                           :onFailure #(callback-wrapper % nil cb)}))))
-
-; (defn login2
-;   [email password cb]
-;   (-> (.signIn Auth email password)
-;       (.then #(cb nil) #(cb %))))
 
 (defn get-aws-credentials
   [user-token cb]

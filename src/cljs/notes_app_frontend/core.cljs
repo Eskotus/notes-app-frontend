@@ -12,9 +12,9 @@
     [goog.events :as events]
     [goog.history.EventType :as EventType]
     [reagent.core :as r]
-    [reagent.session :as session]
+    [reagent.session :as session]))
     ;[aws-amplify :refer [Amplify Auth]]
-    [left-pad]))
+    ;[left-pad]))
 
 ;; -------------------------
 ;; Views
@@ -22,8 +22,8 @@
 (defn current-page
   "Wraps all other page content in container that has navigation in the header"
   []
-  (js/console.log "Left pad: " (left-pad 42 5 0))
-  (js/console.log "Amplify: " Amplify)
+  ;(js/console.log "Left pad: " (left-pad 42 5 0))
+  ;(js/console.log "Amplify: " Amplify)
   (aws/authenticate-user)
   (when (not (session/get :authenticating?))
     [:div.App.container

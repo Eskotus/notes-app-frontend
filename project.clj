@@ -11,9 +11,8 @@
                  [reagent-forms "0.5.35"]
                  [secretary "1.2.3"]
                  [wilson "0.33.1"]
-                 ; [cljsjs/amazon-cognito-identity-js "1.21.0-0"]
-                 ; [cljsjs/aws-sdk-js "2.94.0-0"]
-                 ; [cljsjs/crypto-js "3.1.9-1-0"]
+                 [cljsjs/amazon-cognito-identity-js "1.21.0-0"]
+                 [cljsjs/aws-sdk-js "2.94.0-0"]
                  [org.clojure/core.async "0.4.474"]]
 
   :plugins [[lein-cljsbuild "1.1.5"]
@@ -39,15 +38,14 @@
                        {:source-paths ["src/clj" "src/cljs" "env/dev/cljs"]
                         :compiler
                         {:main "notes-app-frontend.dev"
-                         :npm-deps {:aws-amplify "0.2.9"
-                                    :left-pad "1.1.3"}
                          :install-deps true
                          :output-to "public/js/app.js"
                          :output-dir "public/js/out"
                          :asset-path   "js/out"
                          :source-map true
                          :optimizations :none
-                         :pretty-print  true}
+                         :pretty-print  true
+                         :verbose       true}
                         :figwheel
                         {:on-jsload "notes-app-frontend.core/mount-root"
                          :open-urls ["http://localhost:3449/"]}}
