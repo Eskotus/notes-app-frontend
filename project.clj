@@ -38,7 +38,7 @@
                        {:source-paths ["src/clj" "src/cljs" "env/dev/cljs"]
                         :compiler
                         {:main "notes-app-frontend.dev"
-                         :install-deps true
+                         ;:install-deps true
                          :output-to "public/js/app.js"
                          :output-dir "public/js/out"
                          :asset-path   "js/out"
