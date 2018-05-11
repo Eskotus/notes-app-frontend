@@ -1,7 +1,7 @@
 (ns notes-app-frontend.core
   (:import goog.History)
   (:require
-    [notes-app-frontend.aws-lib :as aws]
+    [notes-app-frontend.aws-lib2 :as aws]
     [notes-app-frontend.components :as c]
     [notes_app_frontend.views.home-page :as home]
     [notes_app_frontend.views.not-found-page :as not-found]
@@ -13,8 +13,6 @@
     [goog.history.EventType :as EventType]
     [reagent.core :as r]
     [reagent.session :as session]))
-    ;[aws-amplify :refer [Amplify Auth]]
-    ;[left-pad]))
 
 ;; -------------------------
 ;; Views
@@ -22,8 +20,6 @@
 (defn current-page
   "Wraps all other page content in container that has navigation in the header"
   []
-  ;(js/console.log "Left pad: " (left-pad 42 5 0))
-  ;(js/console.log "Amplify: " Amplify)
   (aws/authenticate-user)
   (when (not (session/get :authenticating?))
     [:div.App.container

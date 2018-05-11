@@ -3,10 +3,9 @@
     [notes_app_frontend.utils :as u]
     [reagent.core :as r]
     [clojure.string :as s]
-    [reagent.session :as session]
     [cljs.core.async :as a :refer-macros [go]]
     [notes-app-frontend.components :as c]
-    [notes-app-frontend.aws-lib :as aws]))
+    [notes-app-frontend.aws-lib2 :as aws]))
 
 (defn handle-submit
   [event email password loading-atom]
@@ -16,9 +15,7 @@
     (let [result (a/<! (u/<<< aws/login email password))]
       (if (instance? js/Error result)
         (js/alert result)
-        (do
-          (session/put! :authenticated? true)
-          (u/set-hash! ""))))
+        (u/set-hash! "")))
     (reset! loading-atom false)))
 
 (defn validate-login-form

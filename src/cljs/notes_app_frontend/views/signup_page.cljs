@@ -6,7 +6,7 @@
     [reagent.session :as session]
     [cljs.core.async :as a :refer-macros [go]]
     [notes-app-frontend.components :as c]
-    [notes-app-frontend.aws-lib :as aws]
+    [notes-app-frontend.aws-lib2 :as aws]
     [wilson.react-bootstrap :refer [help-block]]))
 
 (defn handle-submit
@@ -25,7 +25,7 @@
   (.preventDefault event)
   (reset! loading? true)
   (go
-    (let [result (a/<! (u/<<< aws/confirm @new-user @confirmation-code))]
+    (let [result (a/<! (u/<<< aws/confirm @email @confirmation-code))]
       (if (instance? js/Error result)
         (js/alert result)
         (let [result (a/<! (u/<<< aws/login @email @password))]

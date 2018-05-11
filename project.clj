@@ -14,6 +14,7 @@
                  [cljsjs/amazon-cognito-identity-js "1.21.0-0"]
                  [cljsjs/aws-sdk-js "2.94.0-0"]
                  [org.clojure/core.async "0.4.474"]]
+                 
 
   :plugins [[lein-cljsbuild "1.1.5"]
             [lein-figwheel "0.5.14"]]

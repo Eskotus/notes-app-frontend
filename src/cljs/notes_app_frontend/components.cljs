@@ -1,6 +1,6 @@
 (ns notes-app-frontend.components
   (:require
-    [notes-app-frontend.aws-lib :as aws]
+    [notes-app-frontend.aws-lib2 :as aws]
     [reagent.core :as r]
     [reagent.session :as session]
     [clojure.string :as s]
