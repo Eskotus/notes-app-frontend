@@ -2,9 +2,9 @@
   (:require
     [notes_app_frontend.utils :as u]
     [notes-app-frontend.components :as c]
+    [notes-app-frontend.aws-lib2 :as aws]
     [reagent.core :as r]
     [clojure.string :as s]
-    [reagent.session :as session]
     [cljs.core.async :as a :refer-macros [go]]))
 
 (def max-attachment-size 5000000)
@@ -12,9 +12,22 @@
 (defn handle-submit
   [event loading? content file]
   (.preventDefault event)
-  (if (> (.-size @file) max-attachment-size)
+  (if (and (some? @file)
+           (> (.-size @file) max-attachment-size))
     (js/alert "Please pick a file smaller than 5MB")
-    (reset! loading? true)))
+    (do
+      (reset! loading? true)
+      (go
+        (let [attachment-result (a/<! (u/<<< aws/s3-upload @file))]
+          (if (instance? js/Error attachment-result)
+            (js/alert attachment-result)
+            (let [note (clj->js {:content @content
+                                 :attachment attachment-result})
+                  result (a/<! (u/<<< aws/create-note note))]
+              (if (instance? js/Error result)
+                (js/alert result)
+                (u/set-hash! "/"))))
+          (reset! loading? false))))))
 
 (defn validate-form
   [content]

@@ -2,6 +2,7 @@
   (:require
     [notes-app-frontend.utils :as u]
     [cljs.core.async :as a :refer-macros [go]]
+    [clojure.string :as s]
     [reagent.session :as session]
     [goog.object :as gobj]))
 
@@ -13,10 +14,10 @@
     :identity-pool-id     "us-east-1:599fa785-1b2d-4682-ad95-91fd32eba5d8"}
    :api-gateway
    {:region               "us-east-1"
-    :url                  ""}
+    :url                  "https://uhawxc57sa.execute-api.us-east-1.amazonaws.com/prod"}
    :s3
    {:region               "us-east-1"
-    :bucket               ""}})
+    :bucket               "notes-app-uploads-20171006"}})
 
 (def amplify-config
   {:Auth
@@ -39,10 +40,16 @@
   []
   (let [amplify (gobj/get js/window "aws-amplify")]
     (-> amplify .-Auth (.configure (clj->js (amplify-config :Auth))))
+    (-> amplify .-API (.configure (clj->js (amplify-config :API))))
+    (-> amplify .-Storage (.configure (clj->js (amplify-config :Storage))))
     amplify))
 
 (defonce amplify
   (get-amplify))
+
+(def auth (.-Auth amplify))
+(def api (.-API amplify))
+(def storage (.-Storage amplify))
 
 (defn callback-wrapper
   "Converts json result to map with keywords"
@@ -53,8 +60,7 @@
 
 (defn login
   [email password cb]
-  (-> amplify
-      .-Auth
+  (-> auth
       (.signIn email password)
       (.then #(callback-wrapper nil % cb))
       (.catch #(cb (js/Error. (.stringify js/JSON %))))))
@@ -64,8 +70,7 @@
   (let [c (a/chan)]
     (go
       (session/put! :authenticating? true)
-      (-> amplify
-          .-Auth
+      (-> auth
           .currentSession
           (.then (fn [result]
                    (session/put! :authenticated? true)
@@ -80,8 +85,7 @@
   []
   (let [c (a/chan)]
     (go
-      (-> amplify
-          .-Auth
+      (-> auth
           .signOut
           (.then (fn []
                    (session/put! :authenticated? false)
@@ -94,16 +98,32 @@
 
 (defn signup
   [email password cb]
-  (-> amplify
-      .-Auth
+  (-> auth
       (.signUp email password)
       (.then #(callback-wrapper nil % cb))
       (.catch #(cb (js/Error. (.stringify js/JSON %))))))
 
 (defn confirm
   [user confirmation-code cb]
-  (-> amplify
-      .-Auth
+  (-> auth
       (.confirmSignUp user confirmation-code)
       (.then #(callback-wrapper nil % cb))
       (.catch #(cb (js/Error. (.stringify js/JSON %))))))
+
+(defn create-note
+  [note cb]
+  (.log js/console (clj->js {:body note}))
+  (-> api
+      (.post "notes" "/notes" (clj->js {:body note}))
+      (.then #(callback-wrapper nil % cb))
+      (.catch #(cb (js/Error. (.stringify js/JSON %))))))
+
+(defn s3-upload
+  [file cb]
+  (let [file-name (str (.now js/Date) "-" (.-name file))
+        opts (clj->js {:contentType (.-type file)})]
+    (-> storage
+        .-vault
+        (.put file-name file opts)
+        (.then #(cb (-> % .-key)))
+        (.catch #(cb (js/Error. (.stringify js/JSON %)))))))
