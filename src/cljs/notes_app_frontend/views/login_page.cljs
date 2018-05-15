@@ -1,11 +1,11 @@
 (ns notes_app_frontend.views.login-page
   (:require
     [notes_app_frontend.utils :as u]
+    [notes-app-frontend.components :as c]
+    [notes-app-frontend.aws-lib2 :as aws]
     [reagent.core :as r]
     [clojure.string :as s]
-    [cljs.core.async :as a :refer-macros [go]]
-    [notes-app-frontend.components :as c]
-    [notes-app-frontend.aws-lib2 :as aws]))
+    [cljs.core.async :as a :refer-macros [go]]))
 
 (defn handle-submit
   [event email password loading-atom]

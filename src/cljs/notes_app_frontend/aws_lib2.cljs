@@ -2,7 +2,6 @@
   (:require
     [notes-app-frontend.utils :as u]
     [cljs.core.async :as a :refer-macros [go]]
-    [clojure.string :as s]
     [reagent.session :as session]
     [goog.object :as gobj]))
 
@@ -127,3 +126,10 @@
         (.put file-name file opts)
         (.then #(cb (-> % .-key)))
         (.catch #(cb (js/Error. (.stringify js/JSON %)))))))
+
+(defn get-notes
+  [cb]
+  (-> api
+      (.get "notes" "/notes")
+      (.then #(callback-wrapper nil % cb))
+      (.catch #(cb (js/Error. (.stringify js/JSON %))))))

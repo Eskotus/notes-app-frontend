@@ -38,6 +38,8 @@
 
 (defroute "/notes/new" [] (session/put! :current-page new-note/render))
 
+(defroute "/notes/:id" [id] (session/put! :current-page nil))
+
 (defroute "*" [] (session/put! :current-page not-found/render))
 
 ;; -------------------------
