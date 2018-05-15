@@ -8,6 +8,7 @@
     [notes_app_frontend.views.login-page :as login]
     [notes_app_frontend.views.signup-page :as signup]
     [notes_app_frontend.views.new-note-page :as new-note]
+    [notes_app_frontend.views.note-page :as note]
     [secretary.core :as secretary :refer-macros [defroute]]
     [goog.events :as events]
     [goog.history.EventType :as EventType]
@@ -38,7 +39,7 @@
 
 (defroute "/notes/new" [] (session/put! :current-page new-note/render))
 
-(defroute "/notes/:id" [id] (session/put! :current-page nil))
+(defroute "/notes/:id" [id] (session/put! :current-page (note/render id)))
 
 (defroute "*" [] (session/put! :current-page not-found/render))
 

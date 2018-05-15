@@ -132,3 +132,12 @@ input[type=file] {
 .Home .notes p {
   color: #666;
 }
+
+.Notes form {
+  padding-bottom: 15px;
+}
+
+.Notes form textarea {
+  height: 300px;
+  font-size: 24px;
+}

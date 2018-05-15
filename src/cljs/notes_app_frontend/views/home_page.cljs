@@ -7,10 +7,6 @@
     [reagent.core :as r]
     [cljs.core.async :as a :refer-macros [go]]))
 
-(defn handle-click
-  [event]
-  nil)
-
 (defn render-notes-list
   [notes]
   (let [cont-notes (into [{:noteId "new" :content "\uFF0B Create a new note" :createdAt (.now js/Date)}] notes)]

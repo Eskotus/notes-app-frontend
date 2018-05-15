@@ -119,17 +119,48 @@
 
 (defn s3-upload
   [file cb]
-  (let [file-name (str (.now js/Date) "-" (.-name file))
-        opts (clj->js {:contentType (.-type file)})]
-    (-> storage
-        .-vault
-        (.put file-name file opts)
-        (.then #(cb (-> % .-key)))
-        (.catch #(cb (js/Error. (.stringify js/JSON %)))))))
+  (if (some? file)
+    (let [file-name (str (.now js/Date) "-" (.-name file))
+          opts (clj->js {:contentType (.-type file)})]
+      (-> storage
+          .-vault
+          (.put file-name file opts)
+          (.then #(cb (-> % .-key)))
+          (.catch #(cb (js/Error. (.stringify js/JSON %))))))
+    (cb nil)))
+
+(defn s3-get
+  [attachment cb]
+  (-> storage
+      .-vault
+      (.get attachment)
+      (.then #(callback-wrapper nil % cb))
+      (.catch #(cb (js/Error. (.stringify js/JSON %))))))
 
 (defn get-notes
   [cb]
   (-> api
       (.get "notes" "/notes")
+      (.then #(callback-wrapper nil % cb))
+      (.catch #(cb (js/Error. (.stringify js/JSON %))))))
+
+(defn get-note
+  [id cb]
+  (-> api
+      (.get "notes" (str "/notes/" id))
+      (.then #(callback-wrapper nil % cb))
+      (.catch #(cb (js/Error. (.stringify js/JSON %))))))
+
+(defn save-note
+  [id note cb]
+  (-> api
+      (.put "notes" (str "/notes/" id) (clj->js {:body note}))
+      (.then #(callback-wrapper nil % cb))
+      (.catch #(cb (js/Error. (.stringify js/JSON %))))))
+
+(defn delete-note
+  [id cb]
+  (-> api
+      (.del "notes" (str "/notes/" id))
       (.then #(callback-wrapper nil % cb))
       (.catch #(cb (js/Error. (.stringify js/JSON %))))))

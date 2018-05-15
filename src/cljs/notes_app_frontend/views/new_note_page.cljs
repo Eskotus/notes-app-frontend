@@ -51,7 +51,7 @@
          [:input {:id         "file"
                   :type       "file"
                   :on-change  #(reset! file (-> % .-target .-files (aget 0)))}]]
-        [c/loader-button {:class        "btn btn-default btn-lg btn-block"
+        [c/loader-button {:class        "btn btn-primary btn-lg btn-block"
                           :loading?     @loading?
                           :loading-text "Creating..."
                           :text         "Create"
