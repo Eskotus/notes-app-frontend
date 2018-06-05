@@ -5,6 +5,7 @@
     [notes-app-frontend.aws-lib2 :as aws]
     [reagent.core :as r]
     [clojure.string :as s]
+    [reagent.session :as session]
     [cljs.core.async :as a :refer-macros [go]]))
 
 (defn handle-submit
@@ -15,7 +16,12 @@
     (let [result (a/<! (u/<<< aws/login email password))]
       (if (instance? js/Error result)
         (js/alert result)
-        (u/set-hash! "")))
+        (do
+          (session/put! :authenticated? true)
+          (prn "Login success")
+          (if-let [redirect (last (re-find #"\?redirect=#(.+)" (.-hash js/location)))]
+            (u/set-hash! redirect)
+            (u/set-hash! "/")))))
     (reset! loading-atom false)))
 
 (defn validate-login-form
@@ -23,7 +29,8 @@
   [email-atom password-atom]
   (or (s/blank? @email-atom) (s/blank? @password-atom)))
 
-(defn render []
+(defn render
+  []
   (let [email (r/atom nil)
         password (r/atom nil)
         loading? (r/atom false)]

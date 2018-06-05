@@ -1,8 +1,10 @@
 (ns notes-app-frontend.utils
   (:require
-    [cljs.core.async :as a]))
+    [cljs.core.async :as a]
+    [reagent.session :as session]))
 
 (defn set-hash! [loc]
+  (prn loc)
   (set! (.-hash js/window.location) loc))
 
 (defn <<< [f & args]

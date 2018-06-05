@@ -3,6 +3,7 @@
   (:require
     [notes-app-frontend.aws-lib2 :as aws]
     [notes-app-frontend.components :as c]
+    [notes_app_frontend.utils :as u]
     [notes_app_frontend.views.home-page :as home]
     [notes_app_frontend.views.not-found-page :as not-found]
     [notes_app_frontend.views.login-page :as login]
@@ -29,17 +30,36 @@
 
 ;; -------------------------
 ;; Routes
+
+(defn route-helper
+  [requires-authentication render-fn]
+  (if requires-authentication
+    (if (session/get :authenticated?)
+      (session/put! :current-page render-fn)
+      (session/put! :current-page
+                    (fn []
+                      (u/set-hash!
+                        (str "/login?redirect="
+                          (.-hash js/location)))
+                      [:div])))
+    (if (session/get :authenticated?)
+      (session/put! :current-page
+                    (fn []
+                      (u/set-hash! "/")
+                      [:div]))
+      (session/put! :current-page render-fn))))
+
 (secretary/set-config! :prefix "#")
 
 (defroute "/" [] (session/put! :current-page home/render))
 
-(defroute "/signup" [] (session/put! :current-page signup/render))
+(defroute "/signup" [] (route-helper false signup/render))
 
-(defroute "/login" [] (session/put! :current-page login/render))
+(defroute "/login" [] (route-helper false login/render))
 
-(defroute "/notes/new" [] (session/put! :current-page new-note/render))
+(defroute "/notes/new" [] (route-helper true new-note/render))
 
-(defroute "/notes/:id" [id] (session/put! :current-page (note/render id)))
+(defroute "/notes/:id" [id] (route-helper true #(note/render id)))
 
 (defroute "*" [] (session/put! :current-page not-found/render))
 
