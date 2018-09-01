@@ -3,7 +3,7 @@
   (:require
     [notes-app-frontend.aws-lib2 :as aws]
     [notes-app-frontend.components :as c]
-    [notes_app_frontend.utils :as u]
+    [notes-app-frontend.utils :as u]
     [notes_app_frontend.views.home-page :as home]
     [notes_app_frontend.views.not-found-page :as not-found]
     [notes_app_frontend.views.login-page :as login]

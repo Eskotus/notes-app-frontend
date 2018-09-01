@@ -51,7 +51,7 @@
                         {:on-jsload "notes-app-frontend.core/mount-root"
                          :open-urls ["http://localhost:3449/"]}}
                        :release
-                       {:source-paths ["src" "env/prod/cljs"]
+                       {:source-paths ["src/clj" "src/cljs" "env/prod/cljs"]
                         :compiler
                         {:output-to "public/js/app.js"
                          :output-dir "public/js/release"
@@ -64,4 +64,6 @@
   :profiles {:dev {:dependencies [[binaryage/devtools "0.9.7"]
                                   [figwheel-sidecar "0.5.14"]
                                   [org.clojure/tools.nrepl "0.2.13"]
-                                  [com.cemerick/piggieback "0.2.2"]]}})
+                                  [com.cemerick/piggieback "0.2.2"]]}}
+
+  :source-paths [])
