@@ -1,6 +1,6 @@
 (ns notes_app_frontend.views.signup-page
   (:require
-    [notes_app_frontend.utils :as u]
+    [notes-app-frontend.utils :as u]
     [reagent.core :as r]
     [clojure.string :as s]
     [reagent.session :as session]

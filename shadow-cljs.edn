@@ -1,0 +1,15 @@
+{:source-paths ["src/clj" "src/cljs"]
+ :dependencies [[reagent "0.7.0"]
+                [reagent-utils "0.2.1"]
+                [reagent-forms "0.5.35"]
+                [secretary "1.2.3"]
+                [wilson "0.33.1"]
+                [org.clojure/core.async "0.4.474"]
+                [thheller/shadow-cljs "2.6.6"]]
+ :builds {:app {:target :browser
+                :output-dir "public/js"
+                :asset-path "js"
+                :modules {:main {:entries [notes-app-frontend.core]}}
+                :devtools {:after-load notes-app-frontend.core/mount-root
+                           :http-root "public"
+                           :http-port 8020}}}}

@@ -1,7 +1,7 @@
 (ns notes_app_frontend.views.note-page
   (:require
     [notes-app-frontend.aws-lib2 :as aws]
-    [notes_app_frontend.utils :as u]
+    [notes-app-frontend.utils :as u]
     [notes-app-frontend.components :as c]
     [reagent.core :as r]
     [clojure.string :as s]

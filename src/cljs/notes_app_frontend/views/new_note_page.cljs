@@ -1,6 +1,6 @@
 (ns notes_app_frontend.views.new-note-page
   (:require
-    [notes_app_frontend.utils :as u]
+    [notes-app-frontend.utils :as u]
     [notes-app-frontend.components :as c]
     [notes-app-frontend.aws-lib2 :as aws]
     [reagent.core :as r]

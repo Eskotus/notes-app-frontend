@@ -3,7 +3,8 @@
     [notes-app-frontend.utils :as u]
     [cljs.core.async :as a :refer-macros [go]]
     [reagent.session :as session]
-    [goog.object :as gobj]))
+    [goog.object :as gobj]
+    ["aws-amplify" :as aa]))
 
 (def config
   {:cognito
@@ -37,7 +38,7 @@
 
 (defn get-amplify
   []
-  (let [amplify (gobj/get js/window "aws-amplify")]
+  (let [amplify aa]
     (-> amplify .-Auth (.configure (clj->js (amplify-config :Auth))))
     (-> amplify .-API (.configure (clj->js (amplify-config :API))))
     (-> amplify .-Storage (.configure (clj->js (amplify-config :Storage))))

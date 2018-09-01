@@ -1,6 +1,6 @@
 (ns notes_app_frontend.views.home-page
   (:require
-    [notes_app_frontend.utils :as u]
+    [notes-app-frontend.utils :as u]
     [notes-app-frontend.aws-lib2 :as aws]
     [clojure.string :as s]
     [reagent.session :as session]

@@ -19,5 +19,5 @@ pom.xml
 pom.xml.asc
 *.iml
 /node_modules
-package-lock.json
-package.json
+figwheel_server.log
+.shadow-cljs
