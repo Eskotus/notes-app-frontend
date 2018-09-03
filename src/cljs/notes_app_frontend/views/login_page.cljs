@@ -31,17 +31,21 @@
 
 (defn render
   []
-  (let [email (r/atom nil)
-        password (r/atom nil)
-        loading? (r/atom false)]
+  (if (= (session/get :authenticated?) false)
+    (let [email (r/atom nil)
+          password (r/atom nil)
+          loading? (r/atom false)]
+      (fn []
+        [:div.Login
+         [:form {:on-submit #(handle-submit % @email @password loading?)}
+          [c/email-form email]
+          [c/password-form password]
+          [c/loader-button {:class        "btn btn-default btn-lg btn-block"
+                            :loading?     @loading?
+                            :loading-text "Logging in..."
+                            :text         "Login"
+                            :disabled     (validate-login-form email password)
+                            :type         "submit"}]]]))
     (fn []
-      [:div.Login
-       [:form {:on-submit #(handle-submit % @email @password loading?)}
-        [c/email-form email]
-        [c/password-form password]
-        [c/loader-button {:class        "btn btn-default btn-lg btn-block"
-                          :loading?     @loading?
-                          :loading-text "Logging in..."
-                          :text         "Login"
-                          :disabled     (validate-login-form email password)
-                          :type         "submit"}]]])))
+      (u/set-hash! "/")
+      [:div])))

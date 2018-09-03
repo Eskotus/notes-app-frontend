@@ -83,12 +83,16 @@
 
 
 (defn render []
-  (let [loading? (r/atom false)
-        new-user (r/atom nil)
-        email (r/atom nil)
-        password (r/atom nil)]
+  (if (= (session/get :authenticated?) false)
+    (let [loading? (r/atom false)
+          new-user (r/atom nil)
+          email (r/atom nil)
+          password (r/atom nil)]
+      (fn []
+        [:div {:class "Signup"}
+         (if (nil? @new-user)
+           [signup-form loading? new-user email password]
+           [confirmation-form loading? new-user email password])]))
     (fn []
-      [:div {:class "Signup"}
-       (if (nil? @new-user)
-         [signup-form loading? new-user email password]
-         [confirmation-form loading? new-user email password])])))
+      (u/set-hash! "/")
+      [:div])))

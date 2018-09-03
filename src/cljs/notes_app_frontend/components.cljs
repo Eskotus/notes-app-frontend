@@ -37,7 +37,7 @@
            :collapseOnSelect true}
    [navbar-header
     [navbar-brand
-     [:a {:href "/"} "Scratch"]]
+     [:a {:href "#/"} "Scratch"]]
     [navbar-toggle]]
    [navbar-collapse
     (if (session/get :authenticated?)

@@ -4,6 +4,7 @@
     [notes-app-frontend.components :as c]
     [notes-app-frontend.aws-lib2 :as aws]
     [reagent.core :as r]
+    [reagent.session :as session]
     [clojure.string :as s]
     [cljs.core.async :as a :refer-macros [go]]))
 
@@ -35,25 +36,31 @@
 
 (defn render
   []
-  (let [content   (r/atom nil)
-        file      (r/atom nil)
-        loading?  (r/atom false)]
+  (if (= (session/get :authenticated?) true)
+    (let [content   (r/atom nil)
+          file      (r/atom nil)
+          loading?  (r/atom false)]
+      (fn []
+        [:div.NewNote
+         [:form {:on-submit #(handle-submit % loading? content file)}
+          [:div.form-group
+           [:textarea {:id         "content"
+                       :class      "form-control"
+                       :value      @content
+                       :on-change  #(reset! content (-> % .-target .-value))}]]
+          [:div.form-group
+           [:label {:for "file" :class "control-label"} "Attachment"]
+           [:input {:id         "file"
+                    :type       "file"
+                    :on-change  #(reset! file (-> % .-target .-files (aget 0)))}]]
+          [c/loader-button {:class        "btn btn-primary btn-lg btn-block"
+                            :loading?     @loading?
+                            :loading-text "Creating..."
+                            :text         "Create"
+                            :type         "submit"
+                            :disabled     (validate-form content)}]]]))
     (fn []
-      [:div.NewNote
-       [:form {:on-submit #(handle-submit % loading? content file)}
-        [:div.form-group
-         [:textarea {:id         "content"
-                     :class      "form-control"
-                     :value      @content
-                     :on-change  #(reset! content (-> % .-target .-value))}]]
-        [:div.form-group
-         [:label {:for "file" :class "control-label"} "Attachment"]
-         [:input {:id         "file"
-                  :type       "file"
-                  :on-change  #(reset! file (-> % .-target .-files (aget 0)))}]]
-        [c/loader-button {:class        "btn btn-primary btn-lg btn-block"
-                          :loading?     @loading?
-                          :loading-text "Creating..."
-                          :text         "Create"
-                          :type         "submit"
-                          :disabled     (validate-form content)}]]])))
+      (u/set-hash!
+        (str "/login?redirect="
+             (.-hash js/location)))
+      [:div])))

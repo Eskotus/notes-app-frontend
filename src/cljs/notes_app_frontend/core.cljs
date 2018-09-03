@@ -14,7 +14,37 @@
     [goog.events :as events]
     [goog.history.EventType :as EventType]
     [reagent.core :as r]
-    [reagent.session :as session]))
+    [reagent.session :as session]
+    [cljs.core.async :as a :refer-macros [go]]))
+
+(defn route-auth-helper
+  [render-fn]
+  (go
+    (session/put! :authenticating? true)
+    (let [result (a/<! (u/<<< aws/authenticate-user2))]
+      (if (instance? js/Error result)
+        (session/put! :authenticated? false)
+        (do
+          (session/put! :authenticated? true)
+          (println "User authenticated"))))
+    (session/put! :authenticating? false)
+    (session/put! :current-page render-fn)))
+;(if requires-authentication
+;  (if (session/get :authenticated?)
+;    (session/put! :current-page render-fn)
+;    (session/put! :current-page
+;                  (fn []
+;                    (u/set-hash!
+;                      (str "/login?redirect="
+;                        (.-hash js/location)))
+;                    [:div])))
+;  (if (session/get :authenticated?)
+;    (session/put! :current-page
+;                  (fn []
+;                    (println "Authenticated, but does not require it")
+;                    (u/set-hash! "/")
+;                    [:div]))
+;    (session/put! :current-page render-fn)))))
 
 ;; -------------------------
 ;; Views
@@ -22,7 +52,9 @@
 (defn current-page
   "Wraps all other page content in container that has navigation in the header"
   []
-  (aws/authenticate-user)
+  (println "current-page"
+           (re-seq #"^.*\(" (str (session/get :current-page)))
+           "authenticating?" (session/get :authenticating?))
   (when (not (session/get :authenticating?))
     [:div.App.container
      (c/navigation)
@@ -31,37 +63,19 @@
 ;; -------------------------
 ;; Routes
 
-(defn route-helper
-  [requires-authentication render-fn]
-  (if requires-authentication
-    (if (session/get :authenticated?)
-      (session/put! :current-page render-fn)
-      (session/put! :current-page
-                    (fn []
-                      (u/set-hash!
-                        (str "/login?redirect="
-                          (.-hash js/location)))
-                      [:div])))
-    (if (session/get :authenticated?)
-      (session/put! :current-page
-                    (fn []
-                      (u/set-hash! "/")
-                      [:div]))
-      (session/put! :current-page render-fn))))
-
 (secretary/set-config! :prefix "#")
 
-(defroute "/" [] (session/put! :current-page home/render))
+(defroute "/" [] (route-auth-helper home/render))
 
-(defroute "/signup" [] (route-helper false signup/render))
+(defroute "/signup" [] (route-auth-helper signup/render))
 
-(defroute "/login" [] (route-helper false login/render))
+(defroute "/login" [] (route-auth-helper login/render))
 
-(defroute "/notes/new" [] (route-helper true new-note/render))
+(defroute "/notes/new" [] (route-auth-helper new-note/render))
 
-(defroute "/notes/:id" [id] (route-helper true #(note/render id)))
+(defroute "/notes/:id" [id] (route-auth-helper #(note/render id)))
 
-(defroute "*" [] (session/put! :current-page not-found/render))
+(defroute "*" [] (route-auth-helper not-found/render))
 
 ;; -------------------------
 ;; History
@@ -85,3 +99,4 @@
   (session/put! :authenticated? false)
   (session/put! :authenticating? true)
   (mount-root))
+

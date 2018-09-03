@@ -76,10 +76,19 @@
                    (session/put! :authenticated? true)
                    (a/put! c result)))
           (.catch (fn [err]
+                    (session/put! :authenticated? false)
                     (a/put! c err))))
       (.log js/console "Session:" (a/<! c))
       (session/put! :authenticating? false)
       (a/close! c))))
+
+(defn authenticate-user2
+  "docstring"
+  [cb]
+  (-> auth
+      .currentSession
+      (.then #(callback-wrapper nil % cb))
+      (.catch #(cb (js/Error. (.stringify js/JSON %))))))
 
 (defn logout
   []
