@@ -1,19 +1,18 @@
 
 ### Development mode
 
-To start the Figwheel compiler, navigate to the project folder and run the following command in the terminal:
+To start the shadow-cljs compiler, navigate to the project folder and run the following command in the terminal:
 
 ```
-lein figwheel
+npm run dev
 ```
 
-Figwheel will automatically push cljs changes to the browser.
-Once Figwheel starts up, you should be able to open the `public/index.html` page in the browser.
+Shadow-cljs will automatically push cljs changes to the browser.
+Once shadow-cljs starts up, you should be able to open the `public/index.html` page in the browser.
 
 
 ### Building for production
 
 ```
-lein clean
-lein package
+npm run release
 ```

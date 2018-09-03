@@ -1,5 +1,5 @@
 (defproject notes-app-frontend "0.0.0"
-  :description "FIXME: write description"
+  :description "Only here for Cursive support!!!"
   :url "http://example.com/FIXME"
   :license {:name "Eclipse Public License"
             :url "http://www.eclipse.org/legal/epl-v10.html"}
