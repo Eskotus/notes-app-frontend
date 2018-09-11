@@ -38,8 +38,9 @@
       [:div.notes
        [:div.page-header
         [:h1 "Your Notes"]]
-       (when (not @loading?)
-         [render-notes-list @notes-atom])])))
+       (if (not @loading?)
+         [render-notes-list @notes-atom]
+         [:div.loader])])))
 
 (defn render []
   [:div.Home

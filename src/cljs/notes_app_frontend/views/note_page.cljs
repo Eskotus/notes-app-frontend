@@ -76,7 +76,7 @@
               (reset! content-atom (:content note))))))
       (fn []
         [:div.Notes
-         (when (some? @note-atom)
+         (if (some? @note-atom)
            [:form {:on-submit #(handle-save-submit % loading? note-atom content-atom file-atom id)}
             [:div.form-group
              [:textarea {:id         "content"
@@ -108,7 +108,8 @@
                               :loading-text "Deleting..."
                               :text         "Delete"
                               :on-click     #(handle-delete % id deleting?)
-                              :type         "button"}]])]))
+                              :type         "button"}]]
+           [:div.loader])]))
     (fn []
       (u/set-hash!
         (str "/login?redirect="
