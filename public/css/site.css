@@ -158,3 +158,10 @@ input[type=file] {
   0% { transform: rotate(0deg); }
   100% { transform: rotate(360deg); }
 }
+
+.Home .lander div {
+  padding-top: 20px;
+}
+.Home .lander div a:first-child {
+  margin-right: 20px;
+}

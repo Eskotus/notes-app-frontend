@@ -22,7 +22,11 @@
   []
   [:div.lander
    [:h1 "Scratch"]
-   [:p "A simple note taking app"]])
+   [:p "A simple note taking app"]
+   [:div
+    [:a.btn.btn-info.btn-lg {:href "/#/login"} "Login"]
+    [:a.btn.btn-success.btn-lg {:href "/#/signup"} "Signup"]]])
+
 
 (defn render-notes
   []
