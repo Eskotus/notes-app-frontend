@@ -95,7 +95,7 @@
   (hook-browser-navigation!)
   (r/render [current-page] (.getElementById js/document "app")))
 
-(defn init []
+(defn ^:export init []
   (session/put! :authenticated? false)
   (session/put! :authenticating? true)
   (mount-root))
