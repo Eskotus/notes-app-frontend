@@ -3,6 +3,8 @@ Notes app frontend for practicing Clojure and AWS with https://serverless-stack.
 
 ### Development mode
 
+TODO: Write instructions for shadow-cljs
+
 To start the Figwheel compiler, navigate to the project folder and run the following command in the terminal:
 
 ```
